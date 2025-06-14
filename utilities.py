@@ -48,13 +48,19 @@ def drag(a, b, speed=1):
     pyautogui.moveTo(b[0], b[1], duration=duration)
     pyautogui.mouseUp()
 
-def drag_many(positions, duration):
-    # print("Drag many:", positions)
+def drag_many(positions, speed):
+    # Set-up
     pyautogui.moveTo(positions[0])
+    previous_pos = positions[0]
     pyautogui.mouseDown()
+    # Loop
     for pos in positions[1:]:
         if pos:
+            dist_a_b = distance(previous_pos, pos)
+            duration = dist_a_b / 500 / speed
             pyautogui.moveTo(pos[0], pos[1], duration=duration)
+            previous_pos = pos
+    # Close
     pyautogui.mouseUp()
 
 def find_image_and_check_color(imageB, sensitivity=10):

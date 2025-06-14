@@ -1,5 +1,6 @@
 To do:
   - Github and own laptop
+  - Add speed to drag many - Done
   - Multi-row fields (extra bolts)
   - Jam (extra experience)
   - Juice (extra experience)

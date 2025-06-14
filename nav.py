@@ -56,7 +56,7 @@ def move_to(thing):
     if result:
         drag(result, position, speed=0.5)
         current_position = position
-        print("Reset current position to:", current_position)
+        # print("Reset current position to:", current_position)
     sleep(0.3)
     # if i_home_cross.find():
     #     i_home_cross.click()

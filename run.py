@@ -31,8 +31,9 @@ sleep(0.5)
 # print(result_1, result_2,      difference(result_1, result_2))
 
 # j_truck.run()
+j_wheat.run()
 
-run_jobs()
+# run_jobs()
 
 sleep(1)
 pyautogui.hotkey('alt', 'tab')

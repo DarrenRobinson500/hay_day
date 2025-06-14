@@ -96,8 +96,23 @@ def truck(job):
         order = i_truck_tick.find(region=ORDER_REGION)
     i_truck_cross.click()
 
-def start_production_field(job):
+def get_positions(position_1, rows):
+    positions = [position_1]
     field_length = 6
+    current_position = add(position_1, [gap_x * field_length, -gap_y * field_length])
+    positions.append(current_position)
+    if rows > 1:
+        current_position = add(current_position, [gap_x, gap_y])
+        positions.append(current_position)
+        current_position = add(current_position, [-gap_x * field_length, gap_y * field_length])
+        positions.append(current_position)
+
+    return positions
+
+def start_production_field_2(job):
+    start_production_field(job, rows=2)
+
+def start_production_field(job, rows=1):
     row = job.production_no
     coord = job.item.production.coords_function(job.production_no)
     if not coord:
@@ -111,28 +126,27 @@ def start_production_field(job):
         if i_scythe.find():
             position_0 = i_scythe.find()
             position_1 = field_coords(row)
-            # position_half = coords(position_1, 0.5, -1)
             if position_1:
-                position_2 = add(position_1, [gap_x * field_length, -gap_y * field_length])
-                if position_0 and position_1 and position_2:
-                    drag_many([position_0, position_1, position_2], 0.85)
-                    sleep(4.5)
-                    pyautogui.click(field_coords(row))
-                    sleep(0.3)
-        # Plant
+                positions = [position_0] + get_positions(position_1=position_1, rows=rows)
+                drag_many(positions, speed=1.15)
+                sleep(4.5)
+                pyautogui.click(field_coords(row))
+                sleep(0.3)
+
+        # Check menu position
         if i_second_page.find():
             print("Second page found")
             i_back_arrows.click()
-
-        if job.item.image_menu.find():
             sleep(0.3)
-            field_coord_start = field_coords(row)
-            print(f"Plant {job.item}")
-            menu_coord = job.item.image_menu.find(confidence=0.87)
 
-            if field_coord_start and menu_coord:
-                field_coord_end = add(field_coord_start, [gap_x * field_length, -gap_y * field_length])
-                drag_many([menu_coord, field_coord_start, field_coord_end], duration=0.85)
+        # Plant
+        if job.item.image_menu.find():
+            print(f"Plant {job.item}")
+            position_0 = job.item.image_menu.find(confidence=0.87)
+            position_1 = field_coords(row)
+            if position_0 and position_1:
+                positions = [position_0] + get_positions(position_1=position_1, rows=rows)
+                drag_many(positions, speed=1.15)
                 sleep(2.0)
 
     sleep(0.3)
@@ -314,7 +328,7 @@ feed_mill.coords_function = feed_mill_coords
 default_sale_items = [wheat, wheat, wheat, wheat, corn, corn, carrots, soybeans, sugarcane, eggs, chicken_feed, pig_feed, cow_feed, sheep_feed]
 
 # Crops
-Job(name="Field", function=start_production_field, reset_time=2, item=wheat, production_no=0)
+j_wheat = Job(name="Field", function=start_production_field_2, reset_time=2, item=wheat, production_no=0)
 Job(name="Field", function=start_production_field, reset_time=2, item=wheat, production_no=1)
 Job(name="Field", function=start_production_field, reset_time=5, item=corn, production_no=2)
 Job(name="Sell", function=sell, reset_time=5, items=default_sale_items, production=field)  #Production added for location only
