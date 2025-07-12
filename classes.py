@@ -5,12 +5,8 @@ import random
 
 
 MENU_REGION = (0, 0, 1100, 900)
-south_west_position = (1388, 272)
-south_east_position = (100, 600)
-center_position = (1000, 560)
-north_west_position = (1700, 700)
-chicken_position = (828, 374)
-cow_position = (1114, 580)
+# chicken_position = (828, 374)
+# cow_position = (1114, 580)
 
 PRODUCTION_ZONE_A = (665, 651, 350, 200)
 PRODUCTION_ZONE_B = (750, 604, 650, 250)
@@ -21,11 +17,12 @@ jobs = []
 
 
 class Production:
-    def __init__(self, name, count, image=None, location=None):
+    def __init__(self, name, count, image=None, location=None, clear_zone=None):
         self.name = name
         self.count = count
         production_units.append(self)
         self.location = location
+        self.clear_zone = clear_zone
         if image:
             self.image = image
         else:
@@ -41,11 +38,25 @@ class Production:
             if item.production == self:
                 own_items.append(item)
         return own_items
+
+    def print_count(self):
+        text = self.name + ":"
+        made_any = False
+        for item in self.items():
+            if item.number_made > 0:
+                text += f"{item}: {item.number_made} "
+                made_any = True
+        if made_any:
+            print(text)
+
     def add_images(self):
         # Own Image
         dir = "images/production/"
         file = [f"{dir}{self.name.lower()}.jpg"]
-        self.image = Image(file)
+        if self.name == "Lure_workbench":
+            self.image = Image(file, name=self.name)
+        else:
+            self.image = Image(file, name=self.name, reference_point=True)
 
     def best_use(self, items):
         print()
@@ -68,12 +79,16 @@ class Production:
         sleep(0.5)
         for item in self.items():
             item_remaining = item.remaining()
-            print(f"Remaining {item}: {item_remaining}")
+            # print(f"Remaining {item}: {item_remaining}")
             remaining_dict[item] = item_remaining
         return remaining_dict
 
     def get_random(self):
         # Must be on the selected production unit to work
+        if self == feed_mill:
+            random_feed = self.get_random_feed()
+            # print("Get random feedmill", random_feed)
+            return self.items()[random_feed]
         remaining_dict = self.remaining()
         fruits = list(remaining_dict.keys())
         weights = list(remaining_dict.values())
@@ -83,9 +98,14 @@ class Production:
             print("All goods made")
             return None
 
+    def get_random_feed(self):
+        animals = [0,1,2,3,4]
+        weights = [10, 6, 2, 2, 1]
+        return random.choices(animals, weights=weights, k=1)[0]
+
 
 class Item:
-    def __init__(self, name, creation_time, price, production, ingredients=None, min_no=2, max_no=20, menu_page=1):
+    def __init__(self, name, creation_time=0, price=0, production=None, ingredients=None, min_no=2, max_no=20, menu_page=1):
         self.name = name
         self.creation_time = creation_time
         self.price = price
@@ -95,7 +115,10 @@ class Item:
         self.min_no = min_no
         self.max_no = max_no
         self.menu_page = menu_page
+        self.current_number = 0
+        self.current_number_time = datetime.now()
         self.add_images()
+        self.number_made = 0
         self.tab = i_barn_tab
         if self.production == field: self.tab = i_silo_tab
 
@@ -136,7 +159,7 @@ class Item:
         # Market
         dir = "images/sales/"
         file = [f"{dir}{self.name.lower()}.jpg"]
-        print("Item creation:", file)
+        # print("Item creation:", file)
         if os.path.isfile(file[0]):
             self.image_market = Image(file)
 
@@ -192,7 +215,9 @@ class Item:
             total_clicks += ingredient.total_clicks() * qty
         return total_clicks
 
-    def count(self):
+    def count(self, forced=False):
+        if datetime.now() < self.current_number_time and not forced:
+            return self.current_number
         if i_second_page.find() and self.menu_page == 1:
             # print("Second page found")
             i_back_arrows.click()
@@ -203,7 +228,7 @@ class Item:
             sleep(0.3)
         if not self.image_menu.find():
             print(f"Item Count. Could not find {self.image_menu}")
-            return 0
+            return self.current_number
         menu = pyautogui.screenshot(region=MENU_REGION)
         menu.save("images/screen/temp.jpg")
         menu_image = cv2.imread("images/screen/temp.jpg", cv2.IMREAD_COLOR)
@@ -215,6 +240,8 @@ class Item:
         if not count: count = 0
         if self.image_menu_mini_1.find(region=PRODUCTION_ZONE_A): count += 1
         if self.image_menu_mini_2.find(region=PRODUCTION_ZONE_B): count += 1
+        self.current_number = count
+        self.current_number_time = datetime.now() + timedelta(minutes=180 + self.creation_time)
         return count
 
     def remaining(self):
@@ -288,37 +315,51 @@ class Animal_Data:
 dir = "images/production/"
 i_feed_mill = Image([dir + "feed_mill.jpg"])
 i_chickens = Image([dir + "chickens.jpg"])
+i_cows = Image([dir + "cows.jpg"])
 i_pigs = Image([dir + "pigs.jpg"])
-i_dairy = Image([dir + "dairy.jpg"])
-i_sugar_mill = Image([dir + "sugar_mill.jpg"])
-i_bakery = Image([dir + "bakery.jpg"])
+# i_dairy = Image([dir + "dairy.jpg"])
+# i_sugar_mill = Image([dir + "sugar_mill.jpg"])
+# i_bakery = Image([dir + "bakery.jpg"])
 
 # Production Locations
 l_feed_mill = Loc("Feed mill", i_feed_mill)
 l_chickens = Loc("Chickens", i_chickens)
 l_pigs = Loc("Pigs", i_pigs)
-l_dairy = Loc("Dairy", i_dairy)
+# l_dairy = Loc("Dairy", i_dairy)
+# l_lure_workbench = Loc("Fishery", i_lure_workbench)
 
 dir = "images/production/"
 i_field = Image([dir + "field.jpg", dir + "field_2.jpg"], name="Field")
 l_field = Loc("Field", i_field)
 
+print()
+print("Create production")
+
 # Fields
 field = Production("Field", 30, image=i_field, location=south_west_position)
 # Animals
 feed_mill = Production("Feed mill", 2, image=i_feed_mill, location=south_west_position)
-chickens = Production("Chickens", 18, image=i_chickens, location=chicken_position)
-cows = Production("Cows", 15, image=i_chickens, location=north_west_position)
+chickens = Production("Chickens", 18, image=i_chickens, location=center_position)
+cows = Production("Cows", 15, image=i_cows, location=center_position)
 pigs = Production("Pigs", 10, image=i_chickens, location=north_west_position)
 sheep = Production("Sheep", 10, image=i_chickens, location=north_west_position)
 goats = Production("Goats", 8, image=i_chickens, location=north_west_position)
 bees = Production("Bees", 1, image=i_beehive, location=north_west_position)
 # Production
-dairy = Production("Dairy", 1, image=i_dairy, location=south_east_position)
-sugar_mill = Production("Sugar mill", 2, image=i_sugar_mill, location=south_east_position)
-bakery = Production("Bakery", 2, image=i_bakery, location=south_east_position)
-bbq_grill = Production("BBQ_Grill", 1, location=south_east_position)
+dairy = Production("Dairy", 1, location=south_east_position, clear_zone=(1148, 535))
+sugar_mill = Production("Sugar_mill", 2, location=south_east_position)
+bakery = Production("Bakery", 2, location=south_east_position, clear_zone=(983, 546))
+bbq_grill = Production("BBQ_Grill", 1, location=south_east_position, clear_zone=(1054, 526))
 icecream_maker = Production("Icecream_maker", 1, location=south_east_position)
-loom = Production("Loom", 1, location=south_east_position)
+pie_oven = Production("Pie_oven", 1, location=east_position, clear_zone=(1148, 976))
+cake_oven = Production("Cake_oven", 1, location=east_position, clear_zone=(1098, 567))
+loom = Production("Loom", 1, location=east_position, clear_zone=(599, 1021))
+honey_extractor = Production("Honey_extractor", 1, location=south_east_position)
+jam_maker = Production("Jam_maker", 1, location=south_east_position)
+juice_press = Production("Juice_press", 1, location=center_position)
 
+lure_workbench = Production("Lure_workbench", 1, location=north_west_position)
+net_maker = Production("Net_maker", 1, location=north_west_position)
+
+for image in reference_images: print(image, image.relative_location)
 

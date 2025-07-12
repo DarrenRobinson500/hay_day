@@ -18,10 +18,10 @@ def feed_mill_coords(no):
 # for feed, count, prod_time in feed_data:
 #     no_per_hour = count / prod_time
 #     print(f"{feed}:, Feed production time: {round(feed.creation_time, 2)}, No of animals: {count}, Produce production time: {prod_time}, Feed required per hour: {round(no_per_hour, 2)}")
-
+#
 # def feed_cycle(item):
 #     move_to(item.production)
-
+#
 # for x in feed_mill.items():
 #     print(x)
 

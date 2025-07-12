@@ -1,4 +1,4 @@
-import time
+# import time
 import pyautogui
 import cv2
 import math
@@ -7,16 +7,55 @@ import os
 from time import *
 from datetime import *
 from datetime import datetime
+import pyautogui
+import ast
+# from shapely.geometry import LineString, box
+
+print("Utilities")
+
+screen_width, screen_height = 1920, 1080
 
 
-# from pynput.keyboard import Controller, Key
-# keyboard = Controller()
+def string_to_tuple(s):
+    if not s:
+        # print("String to tuple - no input")
+        return
+    try:
+        result = ast.literal_eval(s)
+        if isinstance(result, tuple) and all(isinstance(i, int) for i in result):
+            return result
+        else:
+            raise ValueError("Input is not a valid tuple of integers.")
+    except (ValueError, SyntaxError) as e:
+        print(f"Error parsing tuple: {e}")
+        return None
 
-gap_x, gap_y = 52, -26.5
+gap_x, gap_y = 53, -26.8
+
+def spiral(num_turns=24, step_size=35):
+    center_x, center_y = pyautogui.position()
+    """Moves the mouse in an outward spiral."""
+    angle = 0  # Initial angle
+    radius = 25  # Initial radius
+
+    for _ in range(num_turns * 360 // step_size):  # Loop through degrees in steps
+        x = center_x + int(radius * math.cos(math.radians(angle)))
+        y = center_y + int(radius * math.sin(math.radians(angle)))
+
+        pyautogui.moveTo(x, y)
+        # time.sleep(0.01)  # Small delay for smooth movement
+
+        angle += step_size  # Increase angle to move circularly
+        radius += .5  # Gradually increase radius for outward motion
+
+
+# Example usage
+# spiral()
 
 def add(a, b):
-    result = b[0] + a[0], b[1] + a[1]
-    return result
+    if a and b:
+        result = b[0] + a[0], b[1] + a[1]
+        return result
 
 def distance(a, b):
     return math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
@@ -25,7 +64,7 @@ def difference(a, b):
     result = b[0] - a[0], b[1] - a[1]
     return result
 
-def zoom():
+def zoom_old():
     # pyautogui.hotkey('shift', 'z')
     pyautogui.keyDown('shift')
     pyautogui.keyDown('z')
@@ -38,17 +77,36 @@ def zoom():
     pyautogui.keyUp('shift')
 
 
-def drag(a, b, speed=1):
-    if not a or not b: return
+def zoom():
+    for x in range(5):
+        pyautogui.press('f5')
+    for x in range(5):
+        pyautogui.press('f5')
+
+
+def is_point_on_screen(a):
+    if not a: return
+    x, y = a
+    return 0 <= x < screen_width and 0 <= y < screen_height
+
+def drag(a, b, speed=1, add_spiral=False):
+    b = clamp_point_to_screen(a, b)
+    # print("Clamped b:", b)
+    if not is_point_on_screen(a) or not is_point_on_screen(b): return
     dist_a_b = distance(a, b)
     if dist_a_b < 40: return
     duration = dist_a_b / 500 / speed
     pyautogui.moveTo(a)
     pyautogui.mouseDown()
     pyautogui.moveTo(b[0], b[1], duration=duration)
+    if add_spiral: spiral()
     pyautogui.mouseUp()
 
 def drag_many(positions, speed):
+    for position in positions:
+        if not(is_point_on_screen(position)):
+            print(f"Drag many. Point: {position} is not valid")
+            return
     # Set-up
     pyautogui.moveTo(positions[0])
     previous_pos = positions[0]
@@ -63,10 +121,8 @@ def drag_many(positions, speed):
     # Close
     pyautogui.mouseUp()
 
-def find_image_and_check_color(imageB, sensitivity=10):
-    """Finds ImageB in ImageA and determines if the matched region is color or grayscale."""
+def find_image_and_check_color(imageB, sensitivity=20):
     # Load images
-
     screenshot = pyautogui.screenshot()
     imageA = np.array(screenshot)
 
@@ -96,6 +152,7 @@ def find_image_and_check_color(imageB, sensitivity=10):
 
     # Determine if the matched region is grayscale or color
     is_grayscale = (diff_b_g < sensitivity) and (diff_b_r < sensitivity) and (diff_g_r < sensitivity)
+    print(f"Check color: Blue green {diff_b_g} Blue red {diff_b_r} Green red {diff_g_r}")
 
     return False if is_grayscale else True
 
@@ -143,13 +200,13 @@ def match_number(image_path, numbers_dir):
 def coords(base, x, y):
     result_x = base[0] + x * gap_x + y * gap_x
     result_y = base[1] + x * gap_y - y * gap_y
-    result = result_x, result_y
+    result = int(result_x), int(result_y)
     # print("Coords:", base, x, y, result)
     return result
 
 
 def haze(pos_0, pos_left, width, height):
-    rows_per_square = 3
+    rows_per_square = 4
     pos_right = coords(pos_left, width, 0)
     positions = [pos_0, pos_left, pos_right]
     print("Haze positions:", positions)
@@ -158,7 +215,7 @@ def haze(pos_0, pos_left, width, height):
         pos_right = coords(pos_right, 0, 1 / rows_per_square)
         positions.append(pos_left)
         positions.append(pos_right)
-    drag_many(positions, duration=0.5)
+    drag_many(positions, speed=4)
 
 
 def find_files_with_word(directory, word):
@@ -169,7 +226,72 @@ def find_files_with_word(directory, word):
             matching_files.append(directory + filename)
 
     return matching_files
-# Example usage:
-# directory_path = "/path/to/your/directory"
-# print(find_files_with_word(directory_path))
 
+
+def wait_for_image(image, time):
+    interval = 0.5
+    found, count = False, 0
+    while not found and count < time / interval:
+        found = image.find()
+        sleep(interval)
+        print("Wait for image:", count, image)
+        count += 1
+        if count == 40: zoom()
+    return found
+
+def wait_for_images(images_to_click, destination_image, time_seconds):
+    interval = 0.5
+    found, count = False, 0
+    while not found and count < time_seconds / interval:
+        for image in images_to_click:
+            if image.find(): image.click()
+        found = destination_image.find()
+        sleep(interval)
+        print("Wait for image:", count * interval, destination_image)
+        count += 1
+    return found
+
+def clamp_point_to_screen(a, b, min_x=1, min_y=1, max_x=screen_width-1, max_y=screen_height-1):
+    x, y = b
+    clamped_x = max(min_x, min(x, max_x))
+    clamped_y = max(min_y, min(y, max_y))
+    return clamped_x, clamped_y
+
+
+# def clamp_point_to_screen(a, b):
+#
+#     # Define the screen box and the line segment
+#     screen = box(0, 0, screen_width, screen_height)
+#     line = LineString([a, b])
+#
+#     # If b is inside the screen, just return b
+#     if screen.contains(line):
+#         return b
+#
+#     # Intersect the line with the screen bounds
+#     intersection = screen.boundary.intersection(line)
+#
+#     # Handle different intersection types
+#     if intersection.is_empty:
+#         return a  # No intersection found — default to a
+#     elif intersection.geom_type == 'Point':
+#         c = (intersection.x, intersection.y)
+#         print(f"Clamped {b} to {c}")
+#         return c
+#     elif intersection.geom_type == 'MultiPoint':
+#         # Pick the closest point to a
+#         points = list(intersection)
+#         points.sort(key=lambda p: ((p.x - a[0])**2 + (p.y - a[1])**2))
+#         return (points[0].x, points[0].y)
+#     else:
+#         return a  # Fallback
+
+# Example usage:
+a = (400, 300)
+b = (2000, 900)  # Outside a 1024x768 screen
+
+result = clamp_point_to_screen(a, b)
+print("Clamped point on screen edge:", result)
+
+
+print("Utilities End")

@@ -53,7 +53,7 @@ def extract_region(template, image, x_offset, y_offset, w, h, threshold=0.8):
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
     if max_val < threshold:
-        print("Template not found with sufficient confidence.")
+        print("Template not found with sufficient confidence.", max_val, threshold)
         return None
 
     # Determine center coordinates of the best match

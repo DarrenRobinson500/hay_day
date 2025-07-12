@@ -3,11 +3,11 @@ from image import *
 from sales import *
 
 def field_coords(row_no, col_no=0):
-    adj_x, adj_y = 15, -30
+    adj_x, adj_y = 35, -10
     adj_x, adj_y = adj_x - 5 * gap_x, adj_y + 5 * gap_y
     base_coords = i_field_marker.find(confidence=0.88)
     if not base_coords:
-        print("Couldn't find field marker - trying gnome")
+        # print("Couldn't find field marker - trying gnome")
         i_gnome.click(confidence=0.85)
         sleep(0.5)
         base_coords = i_field_marker.find(confidence=0.88)
@@ -67,7 +67,7 @@ def field_loop(crops=(wheat, corn, carrots, soybeans, sugarcane, sugarcane, suga
 
                 if field_coord_start and menu_coord:
                     field_coord_end = add(field_coord_start, [gap_x * 6.5, -gap_y * 6.5])
-                    drag_many([menu_coord, field_coord_start, field_coord_end], duration=0.85)
+                    drag_many([menu_coord, field_coord_start, field_coord_end], speed=1.15)
                     sleep(2.0)
         sleep(0.3)
 
@@ -90,33 +90,38 @@ def loop_wait(minutes=2):
         sleep(8 * 60)
         reload()
         return
-    if i_hay_day_start_icon.find():
-        print(f"Restart")
-        restart()
-        return
+    # if i_hay_day_start_icon.find():
+    #     print(f"Restart")
+    #     restart()
+    #     return
     for x in [i_try_again, i_farm_pass_cross, i_home_cross, i_market_cross, i_market_cross_2, i_silo_full_cross, i_continue, i_not_enough_resources_cross, i_last_crop_cross]:
         if x.find():
             sleep(0.5)
             x.click()
             sleep(2)
+            if x in [i_silo_full_cross,]:
+                print("Loop wait - found i_silo_full_cross")
+                pause_field_production()
+
     print(f"Waiting {minutes} min")
     sleep(minutes * 60)
 
 def clear():
-    # for x in [i_gnome, i_field_marker, i_chicken_marker]:
-    #     if x.find(confidence=0.85): x.click()
-    # move_to(field)
+    for x in [i_home, i_field_marker, i_gnome, i_go_home]:
+        if x.find(): return
+    zoom()
+    # if i_help_marker.find():
+    #     clear_help_markers()
     if i_reload.find():
         print(f"Reload: Waiting 8 min")
         sleep(8 * 60)
         reload()
         return
-    if i_hay_day_start_icon.find():
-        print(f"Restart")
-        restart()
-        return
-    for x in [i_try_again, i_farm_pass_cross, i_home_cross, i_market_cross, i_market_cross_2, i_silo_full_cross, i_continue, i_not_enough_resources_cross, i_last_crop_cross]:
+    for x in [i_help_marker, i_try_again, i_farm_pass_cross, i_home_cross, i_market_cross, i_market_cross_2, i_silo_full_cross, i_continue, i_not_enough_resources_cross, i_last_crop_cross]:
         if x.find():
             sleep(0.5)
             x.click()
             sleep(2)
+            if x in [i_silo_full_cross,]:
+                print("Clear - found i_silo_full_cross")
+                pause_field_production()

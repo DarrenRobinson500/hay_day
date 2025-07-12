@@ -35,12 +35,14 @@ def goto(destination):
     else:
         print(f"Failed to arrive: {destination}")
 
-def save_rel_position(destination, position_0, position_1):
-    relative_position = str(difference(position_1, position_0))
-    db_save(destination.name, relative_position)
+# def save_rel_position(destination, position_0, position_1):
+#     relative_position = str(difference(position_1, position_0))
+#     db_save(destination.name, relative_position)
+
 
 def move_to(thing):
     global current_position
+    i_help_marker.click()
     if type(thing) == Production:
         position = thing.location
     elif type(thing) == Item:
@@ -48,18 +50,24 @@ def move_to(thing):
     else:
         position = thing
     if current_position == position:
-        print(f"Move to: {position}: already there")
+        # print(f"Move to: {position}: already there")
         return
     print("Move to:", thing, position)
     sleep(0.5)
-    result = i_home.find()
+    result, count = i_home.find(), 0
+    while not result and count < 4:
+        move_home_to_center()
+        sleep(0.3)
+        result = i_home.find()
+        count += 1
     if result:
         drag(result, position, speed=0.5)
         current_position = position
-        # print("Reset current position to:", current_position)
+    # else:
+    #     i_hay_day_start_icon.click()
     sleep(0.3)
-    # if i_home_cross.find():
-    #     i_home_cross.click()
+
+
 
 def move_to_center():
     print("Move to center")
@@ -77,6 +85,7 @@ def move_to_center():
     sleep(1)
 
 
+# After the game is loaded by another device
 def reload():
     sleep(0.5)
 
@@ -95,25 +104,27 @@ def reload():
     zoom()
     move_to(field)
 
-def restart():
-    sleep(0.5)
+# def restart():
+#     sleep(0.5)
+#
+#     if i_hay_day_start_icon.find():
+#         i_hay_day_start_icon.click()
+#         result, count = None, 0
+#         while not result and count < 40:
+#             result = i_zoomed_in_house.find()
+#             print("Reload (loops):", count, result)
+#             sleep(0.5)
+#             count += 1
+#         if result:
+#             spot_to_move_to = result[0] - 150, result[1]
+#             pyautogui.moveTo(spot_to_move_to)
+#
+#     if i_event_board_cross.find(): i_event_board_cross.click()
+#
+#     zoom()
+#     move_to(field)
 
-    if i_hay_day_start_icon.find():
-        i_hay_day_start_icon.click()
-        result, count = None, 0
-        while not result and count < 40:
-            result = i_zoomed_in_house.find()
-            print("Reload (loops):", count, result)
-            sleep(0.5)
-            count += 1
-        if result:
-            spot_to_move_to = result[0] - 150, result[1]
-            pyautogui.moveTo(spot_to_move_to)
 
-    if i_event_board_cross.find(): i_event_board_cross.click()
-
-    zoom()
-    move_to(field)
 
 
 l_pycharm = Loc("Pycharm", i_pycharm_icon)

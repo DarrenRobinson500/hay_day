@@ -1,10 +1,19 @@
 To do:
-  - Github and own laptop
+  - Github and own laptop - Done
   - Add speed to drag many - Done
-  - Multi-row fields (extra bolts)
-  - Jam (extra experience)
+  - Multi-row fields (extra bolts) - Done
   - Juice (extra experience)
+  - Jam (extra experience)
   - Sewing machine (extra experience)
   - Truck (extra experience)
-  - Honey (extra experience)
-  - Fish and chips (extra experience)
+  - Dual Honey (extra experience)
+
+Animals
+  - Cows
+  - Pig
+  - Sheep
+  - Goats
+
+Items
+  - Fish and chips
+  - Honey Popcorn
