@@ -38,7 +38,7 @@ class Job:
                 sleep(1.5)
         except: pass
         self.function(self)
-        self.runtime = datetime.now() + timedelta(minutes=self.reset_time)
+        self.runtime = max(datetime.now() + timedelta(minutes=self.reset_time), self.runtime)
         # clear()
         sleep(1)
         # move_to_center()
@@ -148,6 +148,7 @@ def start_production_field_2(job): start_production_field(job, rows=2)
 def start_production_field_3(job): start_production_field(job, rows=3)
 def start_production_field_4(job): start_production_field(job, rows=4)
 def start_production_field_6(job): start_production_field(job, rows=6)
+def start_production_field_7(job): start_production_field(job, rows=7)
 
 def get_to_menu_page(item):
     if item.menu_page == 1:
@@ -218,7 +219,7 @@ def start_production_field_extras(job):
 
 
 def start_production_field(job, rows=1):
-    speed = 1.8
+    speed = 1
     row = job.production_no
     coord = job.item.production.coords_function(job.production_no)
     if not coord:
@@ -237,6 +238,7 @@ def start_production_field(job, rows=1):
                 drag_many(positions, speed=speed)
                 sleep(4.5)
                 if i_silo_full.find():
+                    print("Silo full - pausing production")
                     i_silo_full_cross.click()
                     pause_field_production()
                 pyautogui.click(field_coords(row))
@@ -326,8 +328,8 @@ def find_yourself(job):
 def feed_animals(job):
     if job.item == eggs: data = chicken_data
     if job.item == milk: data = cow_data
-    if job.item == bacon: data = pigs_data
-    if job.item == wool: data = sheep_data
+    # if job.item == bacon: data = pigs_data
+    # if job.item == wool: data = sheep_data
     sleep(0.3)
     if not data.image_marker_1.find():
         find_yourself(job)
@@ -522,54 +524,58 @@ def lobster(job):
 field.coords_function = field_coords
 feed_mill.coords_function = feed_mill_coords
 
-default_sale_items = [wheat, sheep_feed, eggs, chicken_feed, wool, milk, honey_comb, pig_feed, cow_feed, corn, carrots, soybeans, sugarcane,]
+# default_sale_items = [wheat, sheep_feed, eggs, chixcken_feed, wool, milk, honey_comb, pig_feed, cow_feed, corn, carrots, soybeans, sugarcane,]
 # default_sale_items = [wheat, corn, carrots, soybeans, sugarcane]
+default_sale_items = [wheat, corn, soybeans, sugarcane, cow_feed]
 
 # Crops
-j_wheat = Job(name="Wheat", function=start_production_field_3, reset_time=3, item=wheat, production_no=0)
-j_corn = Job(name="Corn", function=start_production_field_2, reset_time=5, item=corn, production_no=3)
-j_carrots = Job(name="Carrots", function=start_production_field, reset_time=10, item=carrots, production_no=5)
-Job(name="Soybeans", function=start_production_field_2, reset_time=20, item=soybeans, production_no=6)
-j_sugarcane = Job(name="Sugar cane", function=start_production_field, reset_time=30, item=sugarcane, production_no=8)
-j_field_extras = Job(name="Field extras", function=start_production_field_extras, reset_time=60)
+j_wheat = Job(name="Wheat", function=start_production_field_4, reset_time=2, item=wheat, production_no=0)
+j_sell = Job(name="Sell", function=sell, reset_time=2.5, items=default_sale_items, production=field)  #Production added for location only
+# Job(name="Wheat", function=start_production_field_2, reset_time=2, item=wheat, production_no=2, first_run=1)
+# Job(name="Wheat", function=start_production_field_2, reset_time=2, item=wheat, production_no=4, first_run=2)
+# j_wheat = Job(name="Wheat", function=start_production_field, reset_time=2, item=wheat, production_no=6)
+j_corn = Job(name="Corn", function=start_production_field, reset_time=5, item=corn, production_no=4)
+# j_carrots = Job(name="Carrots", function=start_production_field, reset_time=10, item=carrots, production_no=5)
+Job(name="Soybeans", function=start_production_field, reset_time=20, item=soybeans, production_no=5)
+j_sugarcane = Job(name="Sugar cane", function=start_production_field_2, reset_time=30, item=sugarcane, production_no=6)
+# j_field_extras = Job(name="Field extras", function=start_production_field_extras, reset_time=60)
 
 # Market
-j_sell = Job(name="Sell", function=sell, reset_time=5, items=default_sale_items, production=field)  #Production added for location only
 
 # Feed mill
 j_feed_mill_0 = Job(name="Feed mill", function=start_production_feed_mill, reset_time=30, item=None, production=feed_mill, production_no=0)
-j_feed_mill_1 = Job(name="Feed mill", function=start_production_feed_mill, reset_time=30, item=None, production=feed_mill, production_no=1, first_run=5)
+# j_feed_mill_1 = Job(name="Feed mill", function=start_production_feed_mill, reset_time=30, item=None, production=feed_mill, production_no=1, first_run=5)
 
 # Animals
-j_eggs = Job(name="Eggs", function=feed_animals, reset_time=20, item=eggs)
+# j_eggs = Job(name="Eggs", function=feed_animals, reset_time=20, item=eggs)
 j_milk = Job(name="Milk", function=feed_animals, reset_time=60, item=milk)
-j_bacon = Job(name="Bacon", function=feed_animals, reset_time=60, item=bacon)
-j_wool = Job(name="Wool", function=feed_animals, reset_time=60, item=wool)
-j_honey_comb = Job(name="Honey_comb", function=collect_honey_comb, reset_time=35, item=honey_comb, first_run=10)
+# j_bacon = Job(name="Bacon", function=feed_animals, reset_time=60, item=bacon)
+# j_wool = Job(name="Wool", function=feed_animals, reset_time=60, item=wool)
+# j_honey_comb = Job(name="Honey_comb", function=collect_honey_comb, reset_time=35, item=honey_comb, first_run=10)
 
 # Production
 production_reset = 60
 j_dairy = Job(name="Dairy", function=start_production_machine, reset_time=production_reset, item=None, production=dairy, first_run=5)
 j_sugar_mill = Job(name="Sugar mill", function=start_production_machine, reset_time=production_reset, item=None, production=sugar_mill, first_run=10)
-j_bakery = Job(name="Bakery", function=start_production_machine, reset_time=production_reset, item=None, production=bakery, first_run=15)
-j_bbq_grill = Job(name="BBQ_Grill", function=start_production_machine, reset_time=production_reset, item=None, production=bbq_grill, first_run=20)
-j_pie_oven = Job(name="Pie_oven", function=start_production_machine, reset_time=production_reset, item=None, production=pie_oven, first_run=22)
-j_cake_oven = Job(name="Cake_oven", function=start_production_machine, reset_time=production_reset, item=None, production=cake_oven, first_run=25)
-j_icecream_maker = Job(name="Icecream_maker", function=start_production_machine, reset_time=production_reset, item=None, production=icecream_maker, first_run=25)
-j_loom = Job(name="Loom", function=start_production_machine, reset_time=production_reset, item=None, production=loom, first_run=30)
-j_honey_extractor = Job(name="Honey extractor", function=start_production_machine, reset_time=35, item=None, production=honey_extractor, first_run=37)
-j_jam_maker = Job(name="Jam maker", function=start_production_machine, reset_time=production_reset, item=None, production=jam_maker, first_run=40)
-j_juice_press = Job(name="Juice press", function=start_production_machine, reset_time=production_reset, item=None, production=juice_press, first_run=40)
+# j_bakery = Job(name="Bakery", function=start_production_machine, reset_time=production_reset, item=None, production=bakery, first_run=15)
+# j_bbq_grill = Job(name="BBQ_Grill", function=start_production_machine, reset_time=production_reset, item=None, production=bbq_grill, first_run=20)
+# j_pie_oven = Job(name="Pie_oven", function=start_production_machine, reset_time=production_reset, item=None, production=pie_oven, first_run=22)
+# j_cake_oven = Job(name="Cake_oven", function=start_production_machine, reset_time=production_reset, item=None, production=cake_oven, first_run=25)
+# j_icecream_maker = Job(name="Icecream_maker", function=start_production_machine, reset_time=production_reset, item=None, production=icecream_maker, first_run=25)
+# j_loom = Job(name="Loom", function=start_production_machine, reset_time=production_reset, item=None, production=loom, first_run=30)
+# j_honey_extractor = Job(name="Honey extractor", function=start_production_machine, reset_time=35, item=None, production=honey_extractor, first_run=37)
+# j_jam_maker = Job(name="Jam maker", function=start_production_machine, reset_time=production_reset, item=None, production=jam_maker, first_run=40)
+# j_juice_press = Job(name="Juice press", function=start_production_machine, reset_time=production_reset, item=None, production=juice_press, first_run=40)
 
 # Fishery
 # j_bait = Job(name="Bait", function=bait, reset_time=60*6, item=None, production=lure_workbench, first_run=50)
 # j_lobster = Job(name="Lobster", function=lobster, reset_time=60*6, item=None, production=net_maker, first_run=40)
 
 # Sales
-j_truck = Job(name="Truck", function=truck, reset_time=60, first_run=5)
+# j_truck = Job(name="Truck", function=truck, reset_time=60, first_run=5)
 
 # Restart
-j_restart = Job(name="Restart", function=restart, reset_time=120, first_run=120)
+# j_restart = Job(name="Restart", function=restart, reset_time=120, first_run=120)
 
 print()
 print("Scheduled Jobs at inception")

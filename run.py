@@ -52,8 +52,9 @@ sleep(0.5)
 # move_home_to_center()
 
 # clear_help_markers()
-# run_jobs(jobs_to_run=[j_sell])
+# run_jobs(jobs_to_run=[j_milk, j_feed_mill_0])
 run_jobs()
+
 
 # left_side, right_side = (400, 400), (1600, 200)
 # move_fishery(right_side)

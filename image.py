@@ -206,7 +206,7 @@ i_continue = Image(['images/warnings/level_up_continue.jpg'], name="Try again")
 # Misc
 dir = "images/fields/"
 i_scythe = Image([dir + "scythe.jpg"])
-i_field_marker = Image(["images/fields/field_marker.jpg", "images/fields/field_marker_2.jpg", "images/fields/field_marker_3.jpg"], name="Field marker", reference_point=True)
+i_field_marker = Image(["images/fields/field_marker.jpg", "images/fields/field_marker_2.jpg", "images/fields/field_marker_3.jpg", "images/fields/field_marker_4.jpg"], name="Field marker", reference_point=True)
 i_feed_mill_marker = Image(["images/nav/gnome.jpg"], name="Feed Mill marker")
 i_chicken_marker = Image(["images/nav/chicken_tree.jpg", "images/nav/chicken_tree_2.jpg", "images/nav/chicken_tree_3.jpg"], name="Chicken marker", reference_point=True)
 i_chicken_basket = Image(["images/production/chicken_basket.jpg", "images/production/chicken_basket_2.jpg"], name="Chicken basket")
@@ -229,6 +229,7 @@ i_market_cross_2 = Image(["images/sales/market_cross_2.jpg"], name="Market cross
 i_sold = Image(["images/sales/sold.jpg"], name="Sold")
 i_existing_sale_box = Image(["images/sales/existing_sale_box.jpg"], name="Existing sale box")
 i_create_advertisement = Image(["images/sales/create_advertisement.jpg"], name="Create advertisement")
+i_create_advertisement_pre = Image(["images/sales/create_advertisement_pre.jpg"], name="Create advertisement (pre)")
 i_roadside_shop = Image(["images/nav/roadside_shop.jpg"], name="Roadside shop")
 i_advertise_now = Image(["images/sales/advertise_now.jpg"])
 

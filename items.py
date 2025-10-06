@@ -24,13 +24,13 @@ chamomile = Item(name="Chamomile", creation_time=0, price=28, production=field, 
 # Animal feed
 chicken_feed = Item(name="Chicken_Feed", creation_time=5/3, price=7, production=feed_mill, ingredients={wheat: 2/3, corn: 1/3}, min_no=10, max_no=20)
 cow_feed = Item(name="Cow_Feed", creation_time=10/3, price=10, production=feed_mill, ingredients={soybeans: 2/3, corn: 1/3}, min_no=8, max_no=20)
-pig_feed = Item(name="Pig_Feed", creation_time=20/3, price=14, production=feed_mill, ingredients={soybeans: 1/3, carrots: 2/3}, min_no=5, max_no=15)
-sheep_feed = Item(name="Sheep_Feed", creation_time=30/3, price=14, production=feed_mill, ingredients={soybeans: 1/3, corn: 3/3}, min_no=5, max_no=15)
-goat_feed = Item(name="Goat_Feed", creation_time=30/3, price=14, production=feed_mill, ingredients={soybeans: 1/3, corn: 3/3}, min_no=5, max_no=15)
+# pig_feed = Item(name="Pig_Feed", creation_time=20/3, price=14, production=feed_mill, ingredients={soybeans: 1/3, carrots: 2/3}, min_no=5, max_no=15)
+# sheep_feed = Item(name="Sheep_Feed", creation_time=30/3, price=14, production=feed_mill, ingredients={soybeans: 1/3, corn: 3/3}, min_no=5, max_no=15)
+# goat_feed = Item(name="Goat_Feed", creation_time=30/3, price=14, production=feed_mill, ingredients={soybeans: 1/3, corn: 3/3}, min_no=5, max_no=15)
 
-feeds = [chicken_feed, cow_feed, pig_feed, sheep_feed, goat_feed]
+feeds = [chicken_feed, cow_feed]
 # Feed, animals, prod_time (hours)
-feed_data = [(chicken_feed, 18, 1/3), (cow_feed, 15, 1), (pig_feed, 10, 4), (sheep_feed, 10, 6), (goat_feed, 8, 8)]
+feed_data = [(chicken_feed, 18, 1/3), (cow_feed, 15, 1)]
 
 print()
 print("Create items")
@@ -38,21 +38,21 @@ print("Create items")
 # Animal products
 eggs = Item(name="Eggs", creation_time=20, price=18, production=chickens, ingredients={chicken_feed: 1}, min_no=6, max_no=12)
 milk = Item("Milk", creation_time=60, price=32, production=cows, ingredients={cow_feed: 1}, min_no=6, max_no=12)
-bacon = Item("Bacon", creation_time=240, price=50, production=pigs, ingredients={pig_feed: 1}, min_no=6, max_no=12)
-wool = Item("Wool", creation_time=240, price=34, production=sheep, ingredients={sheep_feed: 1}, min_no=6, max_no=12)
+# bacon = Item("Bacon", creation_time=240, price=50, production=pigs, ingredients={pig_feed: 1}, min_no=6, max_no=12)
+# wool = Item("Wool", creation_time=240, price=34, production=sheep, ingredients={sheep_feed: 1}, min_no=6, max_no=12)
 honey_comb = Item("Honey_comb", creation_time=45, price=34, production=bees, max_no=10)
 
 # Animal Data
 chicken_data = Animal_Data(production=chickens, position=center_position, feed=chicken_feed, image_marker_1=i_home, squares_x_1=-4, squares_y_1=6, image_marker_2=i_eggs_collect, squares_x_2=-4, squares_y_2=3, squares_width=11, squares_height=5, fine_tune_x=-20, fine_tune_y=0, image_marker_3=chicken_feed.image_menu)
 cow_data = Animal_Data(production=cows, position=center_position, feed=cow_feed, image_marker_1=i_cows, squares_x_1=-1, squares_y_1=-4, image_marker_2=i_milk_collect, squares_x_2=0, squares_y_2=5, squares_width=14, squares_height=5, fine_tune_x=-20, fine_tune_y=0, image_marker_3=cow_feed.image_menu)
-pigs_data = Animal_Data(production=pigs, position=center_position, feed=pig_feed, image_marker_1=i_cows, squares_x_1=-1, squares_y_1=-8, image_marker_2=i_bacon_collect, squares_x_2=0, squares_y_2=5, squares_width=14, squares_height=5, fine_tune_x=-20, fine_tune_y=0, image_marker_3=pig_feed.image_menu)
-sheep_data = Animal_Data(production=sheep, position=center_position, feed=sheep_feed, image_marker_1=i_cows, squares_x_1=-1, squares_y_1=-12, image_marker_2=i_wool_collect, squares_x_2=0, squares_y_2=5, squares_width=14, squares_height=5, fine_tune_x=-20, fine_tune_y=0, image_marker_3=sheep_feed.image_menu)
+# pigs_data = Animal_Data(production=pigs, position=center_position, feed=pig_feed, image_marker_1=i_cows, squares_x_1=-1, squares_y_1=-8, image_marker_2=i_bacon_collect, squares_x_2=0, squares_y_2=5, squares_width=14, squares_height=5, fine_tune_x=-20, fine_tune_y=0, image_marker_3=pig_feed.image_menu)
+# sheep_data = Animal_Data(production=sheep, position=center_position, feed=sheep_feed, image_marker_1=i_cows, squares_x_1=-1, squares_y_1=-12, image_marker_2=i_wool_collect, squares_x_2=0, squares_y_2=5, squares_width=14, squares_height=5, fine_tune_x=-20, fine_tune_y=0, image_marker_3=sheep_feed.image_menu)
 
 # Dairy
 cream = Item("Cream", creation_time=20, price=50, production=dairy, ingredients={milk:1}, min_no=5)
 butter = Item("Butter", creation_time=30, price=82, production=dairy, ingredients={milk:2}, min_no=5)
 cheese = Item("Cheese", creation_time=60, price=122, production=dairy, ingredients={milk:3}, min_no=5)
-goat_cheese = Item("Goat_Cheese", creation_time=60, price=122, production=dairy, ingredients={milk:3}, min_no=3)
+# goat_cheese = Item("Goat_Cheese", creation_time=60, price=122, production=dairy, ingredients={milk:3}, min_no=3)
 
 # Sugar Mill
 brown_sugar = Item("Brown_Sugar", creation_time=20, price=25, production=sugar_mill, ingredients={sugarcane: 1}, min_no=5)
@@ -72,11 +72,11 @@ Item("frutti_di_mare_pizza", production=bakery)
 
 # BBQ Grill
 pancakes = Item("Pancakes", creation_time=30, price=108, production=bbq_grill, ingredients={eggs:3, brown_sugar:1})
-bacon_and_eggs = Item("Bacon_and_eggs", creation_time=60, price=201, production=bbq_grill, ingredients={eggs:4, bacon:2})
-hamburger = Item("Hamburger", creation_time=120, price=180, production=bbq_grill, ingredients={bread:2, bacon:2})
-grilled_tomatoes = Item("Grilled_tomatoes", creation_time=120, price=180, production=bbq_grill, ingredients={bread:2, bacon:2})
-fishburger = Item("Fishburger", creation_time=120, price=180, production=bbq_grill, ingredients={bread:2, bacon:2})
-Item("Baked_potato", creation_time=120, price=180, production=bbq_grill, ingredients={bread:2, bacon:2}, menu_page=2)
+# bacon_and_eggs = Item("Bacon_and_eggs", creation_time=60, price=201, production=bbq_grill, ingredients={eggs:4, bacon:2})
+# hamburger = Item("Hamburger", creation_time=120, price=180, production=bbq_grill, ingredients={bread:2, bacon:2})
+# grilled_tomatoes = Item("Grilled_tomatoes", creation_time=120, price=180, production=bbq_grill, ingredients={bread:2, bacon:2})
+# fishburger = Item("Fishburger", creation_time=120, price=180, production=bbq_grill, ingredients={bread:2, bacon:2})
+# Item("Baked_potato", creation_time=120, price=180, production=bbq_grill, ingredients={bread:2, bacon:2}, menu_page=2)
 
 # Pie oven
 Item("Carrot_pie", production=pie_oven)

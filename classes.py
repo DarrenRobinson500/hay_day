@@ -99,9 +99,10 @@ class Production:
             return None
 
     def get_random_feed(self):
-        animals = [0,1,2,3,4]
-        weights = [10, 6, 2, 2, 1]
-        return random.choices(animals, weights=weights, k=1)[0]
+        return 1
+        # animals = [0,1,2,3,4]
+        # weights = [10, 6, 2, 2, 1]
+        # return random.choices(animals, weights=weights, k=1)[0]
 
 
 class Item:

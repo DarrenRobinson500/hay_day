@@ -13,6 +13,7 @@ def field_coords(row_no, col_no=0):
         base_coords = i_field_marker.find(confidence=0.88)
         if not base_coords:
             print("Couldn't find field marker or gnome")
+            move_to_center()
             return
     base_x, base_y = base_coords
     field_x, field_y = [int(base_x + row_no * gap_x + col_no * gap_x + adj_x), int(base_y + row_no * gap_y - col_no * gap_y + adj_y)]
