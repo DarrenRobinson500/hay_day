@@ -17,12 +17,14 @@ jobs = []
 
 
 class Production:
-    def __init__(self, name, count, image=None, location=None, clear_zone=None):
+    def __init__(self, name, count, image=None, location=None, clear_zone=None, click_offset=[-130, -20]):
         self.name = name
         self.count = count
         production_units.append(self)
         self.location = location
         self.clear_zone = clear_zone
+        self.click_offset = click_offset
+
         if image:
             self.image = image
         else:
@@ -32,6 +34,9 @@ class Production:
         return self.name
     def click(self):
         self.image.click()
+    def click_off(self):
+        self.image.click(click_offset=self.click_offset)
+
     def items(self):
         own_items = []
         for item in items:
@@ -347,17 +352,26 @@ sheep = Production("Sheep", 10, image=i_chickens, location=north_west_position)
 goats = Production("Goats", 8, image=i_chickens, location=north_west_position)
 bees = Production("Bees", 1, image=i_beehive, location=north_west_position)
 # Production
-dairy = Production("Dairy", 1, location=south_east_position, clear_zone=(1148, 535))
+dairy = Production("Dairy", 1, location=south_west_position, click_offset=[-80, -80])
 sugar_mill = Production("Sugar_mill", 2, location=south_east_position)
-bakery = Production("Bakery", 2, location=south_east_position, clear_zone=(983, 546))
-bbq_grill = Production("BBQ_Grill", 1, location=south_east_position, clear_zone=(1054, 526))
+bakery = Production("Bakery", 2, location=south_east_position)
+bbq_grill = Production("BBQ_Grill", 1, location=south_east_position)
+pie_oven = Production("Pie_oven", 1, location=east_position, click_offset=[-50,-30])
+cake_oven = Production("Cake_oven", 1, location=east_position)
+popcorn_pop = Production("Popcorn_pop", 1, location=east_position)
+soup_kitchen = Production("Soup_kitchen", 1, location=east_position, click_offset=[140, -210])
+candle_maker = Production("Candle_maker", 1, location=east_position, click_offset=[0, -90])
 icecream_maker = Production("Icecream_maker", 1, location=south_east_position)
-pie_oven = Production("Pie_oven", 1, location=east_position, clear_zone=(1148, 976))
-cake_oven = Production("Cake_oven", 1, location=east_position, clear_zone=(1098, 567))
-loom = Production("Loom", 1, location=east_position, clear_zone=(599, 1021))
+loom = Production("Loom", 1, location=east_position)
 honey_extractor = Production("Honey_extractor", 1, location=south_east_position)
-jam_maker = Production("Jam_maker", 1, location=south_east_position)
-juice_press = Production("Juice_press", 1, location=center_position)
+juice_press = Production("Juice_press", 1, location=center_position, click_offset=[50, 50])
+jam_maker = Production("Jam_maker", 1, location=south_east_position, click_offset=[180, 30])
+coffee_kiosk = Production("Coffee_kiosk", 1, location=south_east_position, click_offset=[-60, -20])
+loom = Production("Loom", 1, location=south_east_position, click_offset=[-70, -20])
+sewing_machine = Production("Sewing_machine", 1, location=south_east_position, click_offset=[-70, -20])
+sauce_maker = Production("Sauce_maker", 1, location=south_east_position, click_offset=[-100, -20])
+sushi_bar = Production("Sushi_bar", 1, location=south_east_position, click_offset=[-70, -20])
+
 
 lure_workbench = Production("Lure_workbench", 1, location=north_west_position)
 net_maker = Production("Net_maker", 1, location=north_west_position)

@@ -14,6 +14,9 @@ def field_coords(row_no, col_no=0):
         if not base_coords:
             print("Couldn't find field marker or gnome")
             move_to_center()
+            sleep(1.5)
+            move_to(field)
+            sleep(1)
             return
     base_x, base_y = base_coords
     field_x, field_y = [int(base_x + row_no * gap_x + col_no * gap_x + adj_x), int(base_y + row_no * gap_y - col_no * gap_y + adj_y)]

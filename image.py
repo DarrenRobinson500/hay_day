@@ -7,7 +7,7 @@ print("Create images")
 
 PRODUCTION_ZONE = (574, 604, 600, 250)
 centre = int(screen_width / 2), int(screen_height / 2)
-south_west_position = (1388, 252)
+south_west_position = (1088, 152)
 south_east_position = (200, 300)
 east_position = (200, 800)
 center_position = (1000, 560)
@@ -75,6 +75,7 @@ class Image:
         best_confidence = 0
 
         for file, image in self.loaded_images.items():
+            # print("Find", self, file)
             if image is None:
                 continue  # Skip if the image couldn't be loaded
 
@@ -101,21 +102,6 @@ class Image:
 
         return best_match
 
-    # def find_all_old(self, confidence=confidence):
-    #     all_matches = []
-    #     for file, image in self.loaded_images.items():
-    #         if image is None: continue
-    #
-    #         try:
-    #             locations = list(pyautogui.locateAllOnScreen(file, confidence=confidence))
-    #             for loc in locations:
-    #                 center_x = int(loc.left + loc.width // 2)
-    #                 center_y = int(loc.top + loc.height // 2)
-    #                 all_matches.append((center_x, center_y))
-    #         except Exception as e:
-    #             print(f"Did not find '{file}': {e}")
-    #     return all_matches
-    #
     def find_all(self, confidence=confidence):
         all_matches = []
         screenshot = pyautogui.screenshot()
@@ -143,11 +129,13 @@ class Image:
 
         return all_matches
 
-    def click(self, confidence=confidence):
+    def click(self, confidence=confidence, click_offset=(0, 0)):
         position = self.find(confidence)
 
         if position:
-            pyautogui.click(position)
+            position_offset = position[0] + click_offset[0], position[1] + click_offset[1]
+            # print("Position offset:", position, position_offset)
+            pyautogui.click(position_offset)
             # print(f"Clicked on {self} image at {position}")
             return position
         else:
@@ -174,9 +162,11 @@ i_bluestacks_cross = Image(["images/restart/bluestacks_cross.jpg"])
 i_heyday_icon_small = Image(["images/restart/heyday_icon_small.jpg"])
 i_full_screen = Image(["images/restart/full_screen.jpg"])
 i_bluestacks_toolbar_icon = Image("images/restart/bluestacks_toolbar_icon.jpg")
-i_house_small = Image("images/restart/house_small.jpg")
+i_house_small = Image(["images/restart/house_small.jpg", "images/restart/mill_small.jpg", "images/restart/letterbox_small.jpg"])
 i_ld_player_not_max = Image("images/restart/ld_player_not_max.jpg")
 i_oink = Image("images/nav/oink.jpg")
+i_cancel_small = Image("images/nav/cancel_small.jpg")
+i_scarecrow = Image("images/nav/scarecrow.jpg")
 
 # Crosses
 i_home_cross = Image([dir + "house_cross.jpg"])
@@ -190,6 +180,7 @@ i_silo_full = Image("images/fields/silo_full.jpg")
 i_first_page = Image(["images/nav/first_page.jpg", ], name="First Page")
 i_second_page = Image(["images/nav/second_page.jpg",], name="Second Page")
 i_third_page = Image(["images/nav/third_page.jpg"], name="Second Page")
+i_forth_page = Image(["images/nav/forth_page.jpg"], name="Second Page")
 i_back_arrows = Image(["images/nav/back_arrows.jpg"], name="Back Arrows")
 i_forward_arrows = Image(["images/nav/forward_arrows.jpg"], name="Forward Arrows")
 
