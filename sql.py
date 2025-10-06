@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-print("SQL")
+# print("SQL")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_name = os.path.join(BASE_DIR, 'db.sqlite3')
@@ -67,4 +67,4 @@ def db_print_all():
         print("No entries found in the database.")
 
 
-print("SQL end")
+# print("SQL end")

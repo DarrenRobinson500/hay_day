@@ -104,11 +104,18 @@ def advertise_existing():
     if not i_roadside_shop.find():
         print("Not in the shop")
         return
-    sleep(5 * 60)
-    i_existing_sale_box.click()
-    sleep(0.8)
-    pyautogui.click(1189, 507)
-    pyautogui.click(1189, 507)
-    sleep(0.3)
-    i_create_advertisement.click()
-    sleep(0.5)
+    count, no_new_sales = 0, True
+    while count < 5 * 10 and no_new_sales:
+        if i_sold.find():
+            no_new_sales = False
+            i_sold.click()
+        sleep(6)
+
+    if no_new_sales:
+        i_existing_sale_box.click()
+        sleep(0.8)
+        pyautogui.click(1189, 507)
+        # pyautogui.click(1189, 507)
+        sleep(0.3)
+        i_create_advertisement.click()
+        sleep(0.5)

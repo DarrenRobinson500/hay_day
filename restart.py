@@ -15,7 +15,7 @@ def close_app():
 
 def open_app():
     i_bluestacks_toolbar_icon.click()
-    found = wait_for_images(images_to_click=[i_heyday_icon_small, i_hay_day_start_icon], destination_image=i_house_small, time_seconds=120)
+    found = wait_for_images(images_to_click=[i_heyday_icon_small, i_hay_day_start_icon, i_cancel_small, i_scarecrow], destination_image=i_house_small, time_seconds=120)
     if found:
         sleep(1)
         position = i_house_small.find()

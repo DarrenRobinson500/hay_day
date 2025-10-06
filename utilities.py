@@ -11,7 +11,7 @@ import pyautogui
 import ast
 # from shapely.geometry import LineString, box
 
-print("Utilities")
+# print("Utilities")
 
 screen_width, screen_height = 1920, 1080
 
@@ -236,7 +236,9 @@ def wait_for_image(image, time):
         sleep(interval)
         print("Wait for image:", count, image)
         count += 1
-        if count == 40: zoom()
+        if count == 40:
+            zoom()
+            pyautogui.press("f11")
     return found
 
 def wait_for_images(images_to_click, destination_image, time_seconds):
@@ -257,6 +259,83 @@ def clamp_point_to_screen(a, b, min_x=1, min_y=1, max_x=screen_width-1, max_y=sc
     clamped_y = max(min_y, min(y, max_y))
     return clamped_x, clamped_y
 
+
+def capture_screen_region_cv2(center_x, center_y, width, height):
+    # Calculate top-left corner
+    left = int(center_x - width / 2)
+    top = int(center_y - height / 2)
+
+    # Capture region using pyautogui
+    screenshot = pyautogui.screenshot(region=(left, top, width, height))
+
+    # Convert PIL image to NumPy array (OpenCV format)
+    img_cv2 = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+
+    return img_cv2
+
+
+def compare_images(img1, img2):
+    # Ensure both images are the same size
+    if img1.shape != img2.shape:
+        raise ValueError("Images must be the same size and shape")
+
+    # Convert to grayscale for simplicity
+    gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+    # Compute Mean Squared Error
+    mse = np.mean((gray1 - gray2) ** 2)
+
+    # Normalize similarity (lower MSE means more similar)
+    similarity = 1 / (1 + mse)  # Range: (0, 1], closer to 1 is more similar
+
+    return similarity
+
+def are_images_equal(img1, img2):
+
+    # Check if both images were loaded successfully
+    if img1 is None or img2 is None:
+        raise ValueError("One or both image paths are invalid or the images couldn't be loaded.")
+
+    # Check if dimensions match
+    if img1.shape != img2.shape:
+        print("Shape difference:", img1.shape, img2.shape)
+        return False
+
+
+    print("Showing images")
+    show_dual_images(img1, img2)
+
+    # Compare pixel-wise
+    difference = cv2.absdiff(img1, img2)
+    if np.any(difference):
+        return False
+
+    return True
+
+def show_dual_images(img1, img2, window_name="Side by Side"):
+    # Resize images to the same height if needed
+    h1, w1 = img1.shape[:2]
+    h2, w2 = img2.shape[:2]
+
+    if h1 != h2:
+        # Scale img2 to match img1's height
+        scale = h1 / h2
+        img2 = cv2.resize(img2, (int(w2 * scale), h1))
+
+    # Concatenate horizontally
+    combined = np.hstack((img1, img2))
+
+    # Show the combined image
+    pyautogui.hotkey('alt', 'tab')
+    sleep(0.5)
+
+    cv2.imshow(window_name, combined)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    sleep(0.5)
+    pyautogui.hotkey('alt', 'tab')
 
 # def clamp_point_to_screen(a, b):
 #
@@ -287,11 +366,11 @@ def clamp_point_to_screen(a, b, min_x=1, min_y=1, max_x=screen_width-1, max_y=sc
 #         return a  # Fallback
 
 # Example usage:
-a = (400, 300)
-b = (2000, 900)  # Outside a 1024x768 screen
+# a = (400, 300)
+# b = (2000, 900)  # Outside a 1024x768 screen
 
-result = clamp_point_to_screen(a, b)
-print("Clamped point on screen edge:", result)
+# result = clamp_point_to_screen(a, b)
+# print("Clamped point on screen edge:", result)
 
 
-print("Utilities End")
+# print("Utilities End")

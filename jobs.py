@@ -5,7 +5,7 @@ from items import *
 
 
 class Job:
-    def __init__(self, name, function, reset_time, item=None, production=None, production_no=None, items=None, first_run=0):
+    def __init__(self, name, function, reset_time, item=None, production=None, production_no=None, items=None, first_run=0, exclude=False):
         self.name = name
         self.function = function
         self.item = item
@@ -19,7 +19,8 @@ class Job:
             self.runtime = datetime.now() + timedelta(minutes=first_run)
         else:
             self.runtime = datetime.now() + timedelta(minutes=len(jobs) * 0.25)
-        jobs.append(self)
+        if not exclude:
+            jobs.append(self)
 
     def __str__(self):
         # if self.item:
@@ -32,6 +33,7 @@ class Job:
         if self.production:
             move_to(self.production)
             sleep(1.5)
+
         try:
             if self == j_truck:
                 move_home_to_center()
@@ -126,7 +128,7 @@ def truck(job):
 
 def get_positions(position_1, rows):
     positions = [position_1]
-    field_length = 6
+    field_length = account.field_length
     current_position = add(position_1, [gap_x * field_length, -gap_y * field_length])
     positions.append(current_position)
 
@@ -151,11 +153,16 @@ def start_production_field_6(job): start_production_field(job, rows=6)
 
 def get_to_menu_page(item):
     if item.menu_page == 1:
-        if i_third_page.find():
+        if i_second_page.find():
+            i_back_arrows.click()
+            sleep(0.3)
+        elif i_third_page.find():
+            i_forward_arrows.click()
+            sleep(0.1)
             i_forward_arrows.click()
             sleep(0.3)
-        elif i_second_page.find():
-            i_back_arrows.click()
+        elif i_forth_page.find():
+            i_forward_arrows.click()
             sleep(0.3)
     if item.menu_page == 2:
         if i_first_page.find():
@@ -164,11 +171,21 @@ def get_to_menu_page(item):
         elif i_third_page.find():
             i_back_arrows.click()
             sleep(0.3)
-    if item.menu_page == 3:
-        if i_second_page.find():
+        elif i_forth_page.find():
+            i_forward_arrows.click()
+            sleep(0.1)
             i_forward_arrows.click()
             sleep(0.3)
-        elif i_first_page.find():
+    if item.menu_page == 3:
+        if i_first_page.find():
+            i_forward_arrows.click()
+            sleep(0.1)
+            i_forward_arrows.click()
+            sleep(0.3)
+        elif i_second_page.find():
+            i_forward_arrows.click()
+            sleep(0.3)
+        elif i_forth_page.find():
             i_back_arrows.click()
             sleep(0.3)
 
@@ -176,7 +193,7 @@ def get_to_menu_page(item):
 def start_production_field_extras(job):
     speed = 1.8
     spots = [(x, -1) for x in range(9)] #+ [(x, 8) for x in range(3)]
-    items = [strawberry, potato, chamomile, tomato, chilli, cotton, indigo, pumpkin, None]
+    items = [strawberry, potato, chamomile, asparagus, tomato, chilli, cotton, indigo, pumpkin, None]
     item_no = 0
     item = items[item_no]
 
@@ -196,11 +213,14 @@ def start_production_field_extras(job):
         get_to_menu_page(item)
         # Plant
         if item and item.image_menu.find():
-            while item and (item.count() >= item.min_no or item.count() == 0):
+            item_count = item.count()
+            while item and (item_count >= item.min_no or item_count == 0):
+                print("Field Extra (not making):", item, item_count)
                 item_no += 1
                 item = items[item_no]
                 if item:
                     get_to_menu_page(item)
+                    item_count = item.count()
                     sleep(0.1)
             if item:
                 print(f"Plant {item}")
@@ -243,10 +263,11 @@ def start_production_field(job, rows=1):
                 sleep(0.3)
 
         # Check menu position
-        if i_second_page.find():
-            print("Second page found")
-            i_back_arrows.click()
-            sleep(0.3)
+        get_to_menu_page(job.item)
+        # if i_second_page.find():
+        #     print("Second page found")
+        #     i_back_arrows.click()
+        #     sleep(0.3)
 
         # Plant
         if job.item.image_menu.find():
@@ -362,12 +383,12 @@ def feed_animals(job):
     #     else:
     #         print("Cow data image marker not found")
 
-def start_production_machine(job):
-    test_image = job.production.items()[0].image_menu
+def start_production_machine(machine):
+    test_image = machine.items()[0].image_menu
     # Clear produced goods
     opened, count = False, 0
     while not opened and count < 4:
-        coord = job.production.image.find()
+        coord = machine.image.find()
         if coord:
             pyautogui.click(coord)
             sleep(2)
@@ -376,7 +397,7 @@ def start_production_machine(job):
         count += 1
         sleep(0.3)
     if not opened:
-        print("Start Production Machine. Couldn't find:", job.production)
+        print("Start Production Machine. Couldn't find:", machine)
         return
 
     # Load up production slots
@@ -389,7 +410,7 @@ def start_production_machine(job):
             i_back_arrows.click()
             sleep(0.3)
         if test_image.find() and production_slot:
-            item = job.production.get_random()
+            item = machine.get_random()
             if item:
                 if i_second_page.find() and item.menu_page == 1:
                     i_back_arrows.click()
@@ -397,7 +418,7 @@ def start_production_machine(job):
                 if i_first_page.find() and item.menu_page == 2:
                     i_forward_arrows.click()
                     sleep(0.3)
-                print(f"Produce in {job.production}:", item)
+                print(f"Produce in {machine}:", item)
                 a = item.image_menu.find()
                 if a and production_slot:
                     drag(a, production_slot)
@@ -412,21 +433,22 @@ def start_production_machine(job):
                 count = 5
         sleep(0.7)
         production_slot = i_production_slot.find()
+        machine.click_off()
         # print("Production slot (loop):", production_slot)
     if not production_slot:
-        print(f"{job.production}: is full.")
-    if job.production.clear_zone:
-        pyautogui.click(job.production.clear_zone)
+        print(f"{machine}: is full.")
+    # if job.production.clear_zone:
+    #     pyautogui.click(job.production.clear_zone)
     # if job.production == bbq_grill:
     #     pyautogui.click(818, 1178)
     # elif job.production == dairy:
     #     pyautogui.click(518, 878)
     # elif job.production == loom:
     #     pyautogui.click(504, 1014)
-    elif job.name != "Bait":
-        pyautogui.click(1118, 878)
+    # elif job.name != "Bait":
+    #     pyautogui.click(1118, 878)
     # drag((400, 2000), (300, 1000))
-    sleep(2)
+    sleep(1)
 
 def collect_honey_comb(job):
     print("Collecting Honey")
@@ -522,51 +544,65 @@ def lobster(job):
 field.coords_function = field_coords
 feed_mill.coords_function = feed_mill_coords
 
-default_sale_items = [wheat, sheep_feed, eggs, chicken_feed, wool, milk, honey_comb, pig_feed, cow_feed, corn, carrots, soybeans, sugarcane,]
+default_sale_items = [wheat, bacon, sheep_feed, eggs, chicken_feed, wool, milk, honey_comb, pig_feed, cow_feed, corn, carrots, soybeans, sugarcane,]
 # default_sale_items = [wheat, corn, carrots, soybeans, sugarcane]
 
 # Crops
-j_wheat = Job(name="Wheat", function=start_production_field_3, reset_time=3, item=wheat, production_no=0)
-j_corn = Job(name="Corn", function=start_production_field_2, reset_time=5, item=corn, production_no=3)
+j_wheat = Job(name="Wheat", function=start_production_field_4, reset_time=3, item=wheat, production_no=0)
+j_corn = Job(name="Corn", function=start_production_field, reset_time=5, item=corn, production_no=4)
 j_carrots = Job(name="Carrots", function=start_production_field, reset_time=10, item=carrots, production_no=5)
-Job(name="Soybeans", function=start_production_field_2, reset_time=20, item=soybeans, production_no=6)
+j_soybeans = Job(name="Soybeans", function=start_production_field_2, reset_time=20, item=soybeans, production_no=6)
 j_sugarcane = Job(name="Sugar cane", function=start_production_field, reset_time=30, item=sugarcane, production_no=8)
+# j_cotton = Job(name="Cotton", function=start_production_field, reset_time=150, item=cotton, production_no=6)
 j_field_extras = Job(name="Field extras", function=start_production_field_extras, reset_time=60)
 
 # Market
 j_sell = Job(name="Sell", function=sell, reset_time=5, items=default_sale_items, production=field)  #Production added for location only
 
 # Feed mill
-j_feed_mill_0 = Job(name="Feed mill", function=start_production_feed_mill, reset_time=30, item=None, production=feed_mill, production_no=0)
-j_feed_mill_1 = Job(name="Feed mill", function=start_production_feed_mill, reset_time=30, item=None, production=feed_mill, production_no=1, first_run=5)
+j_feed_mill_0 = Job(name="Feed mill", function=start_production_feed_mill, reset_time=90, item=None, production=feed_mill, production_no=0)
+j_feed_mill_1 = Job(name="Feed mill", function=start_production_feed_mill, reset_time=90, item=None, production=feed_mill, production_no=1)
 
 # Animals
 j_eggs = Job(name="Eggs", function=feed_animals, reset_time=20, item=eggs)
 j_milk = Job(name="Milk", function=feed_animals, reset_time=60, item=milk)
 j_bacon = Job(name="Bacon", function=feed_animals, reset_time=60, item=bacon)
 j_wool = Job(name="Wool", function=feed_animals, reset_time=60, item=wool)
-j_honey_comb = Job(name="Honey_comb", function=collect_honey_comb, reset_time=35, item=honey_comb, first_run=10)
+j_honey_comb = Job(name="Honey_comb", function=collect_honey_comb, reset_time=35, item=honey_comb)
+
+def production_all(job):
+    machines = [dairy, sugar_mill, bakery, bbq_grill, pie_oven, cake_oven, soup_kitchen, icecream_maker, honey_extractor, candle_maker, juice_press, jam_maker, coffee_kiosk, loom, sewing_machine]
+    # machines = [sugar_mill, sauce_maker, sushi_bar]
+    for machine in machines:
+        print("Starting:", machine)
+        machine.click()
+        sleep(1)
+        start_production_machine(machine)
+        machine.click_off()
+        sleep(1)
+
 
 # Production
 production_reset = 60
-j_dairy = Job(name="Dairy", function=start_production_machine, reset_time=production_reset, item=None, production=dairy, first_run=5)
-j_sugar_mill = Job(name="Sugar mill", function=start_production_machine, reset_time=production_reset, item=None, production=sugar_mill, first_run=10)
-j_bakery = Job(name="Bakery", function=start_production_machine, reset_time=production_reset, item=None, production=bakery, first_run=15)
-j_bbq_grill = Job(name="BBQ_Grill", function=start_production_machine, reset_time=production_reset, item=None, production=bbq_grill, first_run=20)
-j_pie_oven = Job(name="Pie_oven", function=start_production_machine, reset_time=production_reset, item=None, production=pie_oven, first_run=22)
-j_cake_oven = Job(name="Cake_oven", function=start_production_machine, reset_time=production_reset, item=None, production=cake_oven, first_run=25)
-j_icecream_maker = Job(name="Icecream_maker", function=start_production_machine, reset_time=production_reset, item=None, production=icecream_maker, first_run=25)
-j_loom = Job(name="Loom", function=start_production_machine, reset_time=production_reset, item=None, production=loom, first_run=30)
-j_honey_extractor = Job(name="Honey extractor", function=start_production_machine, reset_time=35, item=None, production=honey_extractor, first_run=37)
-j_jam_maker = Job(name="Jam maker", function=start_production_machine, reset_time=production_reset, item=None, production=jam_maker, first_run=40)
-j_juice_press = Job(name="Juice press", function=start_production_machine, reset_time=production_reset, item=None, production=juice_press, first_run=40)
+j_production = Job(name="Production", function=production_all, reset_time=production_reset, item=None, production=dairy)
+# j_dairy = Job(name="Dairy", function=start_production_machine, reset_time=production_reset, item=None, production=dairy, exclude=True)
+# j_sugar_mill = Job(name="Sugar mill", function=start_production_machine, reset_time=production_reset, item=None, production=sugar_mill, exclude=True)
+# j_bakery = Job(name="Bakery", function=start_production_machine, reset_time=production_reset, item=None, production=bakery, first_run=15, exclude=True)
+# j_bbq_grill = Job(name="BBQ_Grill", function=start_production_machine, reset_time=production_reset, item=None, production=bbq_grill, first_run=20, exclude=True)
+# j_pie_oven = Job(name="Pie_oven", function=start_production_machine, reset_time=production_reset, item=None, production=pie_oven, first_run=22, exclude=True)
+# j_cake_oven = Job(name="Cake_oven", function=start_production_machine, reset_time=production_reset, item=None, production=cake_oven, first_run=25, exclude=True)
+# j_icecream_maker = Job(name="Icecream_maker", function=start_production_machine, reset_time=production_reset, item=None, production=icecream_maker, first_run=25)
+# j_loom = Job(name="Loom", function=start_production_machine, reset_time=production_reset, item=None, production=loom)
+# j_honey_extractor = Job(name="Honey extractor", function=start_production_machine, reset_time=35, item=None, production=honey_extractor, first_run=37)
+# j_jam_maker = Job(name="Jam maker", function=start_production_machine, reset_time=production_reset, item=None, production=jam_maker, first_run=40)
+# j_juice_press = Job(name="Juice press", function=start_production_machine, reset_time=production_reset, item=None, production=juice_press, first_run=40)
 
 # Fishery
 # j_bait = Job(name="Bait", function=bait, reset_time=60*6, item=None, production=lure_workbench, first_run=50)
 # j_lobster = Job(name="Lobster", function=lobster, reset_time=60*6, item=None, production=net_maker, first_run=40)
 
 # Sales
-j_truck = Job(name="Truck", function=truck, reset_time=60, first_run=5)
+# j_truck = Job(name="Truck", function=truck, reset_time=60)
 
 # Restart
 j_restart = Job(name="Restart", function=restart, reset_time=120, first_run=120)

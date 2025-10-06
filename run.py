@@ -15,7 +15,7 @@ from feed_mill import *
 pyautogui.hotkey('alt', 'tab')
 sleep(0.5)
 
-# remaining_dict = juice_press.remaining()
+# remaining_dict = sugar_mill.remaining()
 # for key, value in remaining_dict.items():
 #     print(f"{key}: {value}")
 
@@ -49,11 +49,21 @@ sleep(0.5)
 # j_bait.run()
 # j_lobster.run()
 
-# move_home_to_center()
-
-# clear_help_markers()
-# run_jobs(jobs_to_run=[j_sell])
 run_jobs()
+
+# machine = sauce_maker
+# show(machine.items()[0].image_menu.image)
+# print("Test image:", machine.items()[0].image_menu.find())
+
+# for x in [dairy, sugar_mill, bakery, bbq_grill, pie_oven, cake_oven, soup_kitchen, icecream_maker, honey_extractor, candle_maker, juice_press, jam_maker, coffee_kiosk, loom, sewing_machine, sauce_maker, sushi_bar]:
+# # for x in [sugar_mill, bakery, bbq_grill, pie_oven, cake_oven]:
+#     x.click()
+#     sleep(1)
+#     x.click_off()
+#     sleep(1)
+
+# print(butter.min_no)
+
 
 # left_side, right_side = (400, 400), (1600, 200)
 # move_fishery(right_side)
